@@ -23,6 +23,12 @@ but keep the BAR reads/writes local to the Framework whenever possible.
 | `litefury-health.sh` | Read `GHLT`/legacy health telemetry and print `temperature_c` |
 | `litefury-flash-image.sh` | Program or verify an image through a target SPI backend |
 | `litefury-protect-golden.sh` | Status/protect/unprotect/verify the golden flash region |
+| `litefury-spi-program.sh` | LiteFury SPI-loader adapter for image program + verify |
+| `litefury-spi-verify.sh` | LiteFury SPI-loader adapter for verify-only compare |
+| `litefury-spi-protect-status.sh` | S25FL PPB protection status adapter |
+| `litefury-spi-protect.sh` | S25FL PPB protect adapter for the golden range |
+| `litefury-spi-unprotect.sh` | S25FL PPB erase adapter for golden refresh |
+| `litefury-spi-verify-protect.sh` | S25FL PPB verify adapter for gate use |
 | `litefury-gate-env.sh` | Exports callback commands for root GoldenGate gate templates |
 | `litefury-install-framework-host.sh` | Stages target tools onto Framework Linux |
 
@@ -65,24 +71,45 @@ targets/litefury-artix7/tools/litefury-flash-image.sh \
   --slot A --image app-slot-a.bin --dry-run
 ```
 
-Live flash programming requires target backend commands:
+This target pack ships LiteFury backend adapters. By default they look for the
+LiteFury `spi-loader` binary in:
 
 ```text
-LITEFURY_FLASH_PROGRAM_CMD IMAGE_PATH ADDRESS_HEX SIZE_BYTES
-LITEFURY_FLASH_READ_CMD    ADDRESS_HEX SIZE_BYTES OUTPUT_PATH
+/opt/goldengate/bin/spi-loader
+/opt/haptica/litefury/bin/spi-loader
+$PATH
 ```
 
-Golden protection similarly delegates to backend commands:
+Override with `LITEFURY_SPI_LOADER=/path/to/spi-loader` if your install differs.
+The live adapter command contract remains:
 
 ```text
-LITEFURY_FLASH_PROTECT_STATUS_CMD BASE_HEX LIMIT_HEX
-LITEFURY_FLASH_PROTECT_CMD        BASE_HEX LIMIT_HEX LOCK_PPB_0_OR_1
-LITEFURY_FLASH_UNPROTECT_CMD      BASE_HEX LIMIT_HEX
-LITEFURY_FLASH_VERIFY_PROTECT_CMD BASE_HEX LIMIT_HEX
+litefury-spi-program.sh IMAGE_PATH ADDRESS_HEX SIZE_BYTES
+litefury-spi-verify.sh  IMAGE_PATH ADDRESS_HEX SIZE_BYTES
 ```
 
-This split is deliberate. The target pack owns the safe ceremony and evidence;
-the board installation binds those commands to the actual LiteFury SPI bridge.
+Golden protection uses a second adapter around the S25FL PPB helper. By default
+it looks for:
+
+```text
+/opt/goldengate/bin/haptica-spi-protect
+/opt/haptica/litefury/bin/haptica-spi-protect
+$PATH
+```
+
+Override with `LITEFURY_SPI_PROTECT_TOOL=/path/to/haptica-spi-protect` if your
+install differs. The adapter command contract is:
+
+```text
+litefury-spi-protect-status.sh BASE_HEX LIMIT_HEX
+litefury-spi-protect.sh        BASE_HEX LIMIT_HEX LOCK_PPB_0_OR_1
+litefury-spi-unprotect.sh      BASE_HEX LIMIT_HEX
+litefury-spi-verify-protect.sh BASE_HEX LIMIT_HEX
+```
+
+This split is deliberate but not hand-wavy. The target pack owns the safe
+ceremony, addresses, locks, confirmation prompts, and evidence. The underlying
+board install only needs to provide the LiteFury SPI bridge binaries.
 
 ## Safety
 

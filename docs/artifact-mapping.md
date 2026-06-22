@@ -28,6 +28,8 @@ For the first real hardware target, the board-specific facts now live under
 | PCIe remove/rescan helper | `tools/transport-rescan-example.sh` |
 | Golden write-protection gate | `tools/gate-golden-protect.sh`, `docs/safety-model.md` |
 | Protected golden refresh ceremony | `tools/gate-protected-golden-refresh.sh`, `docs/operations-runbook.md` |
+| LiteFury SPI loader command shape | `targets/litefury-artix7/tools/litefury-spi-program.sh`, `targets/litefury-artix7/tools/litefury-spi-verify.sh` |
+| S25FL PPB protection helper shape | `targets/litefury-artix7/tools/litefury-spi-protect.sh`, `targets/litefury-artix7/tools/litefury-spi-unprotect.sh`, `targets/litefury-artix7/tools/litefury-spi-verify-protect.sh` |
 | Event and evidence records | `specs/event-log.schema.json`, `specs/gate-evidence.schema.json` |
 
 ## Deliberate Omissions
@@ -36,11 +38,14 @@ Not copied:
 
 - product-specific game, media, sensor, or UI surfaces
 - private hostnames, service names, or network assumptions
-- board-specific flash opcodes
+- board-specific flash-opcode implementations
 - vendor bitstream build scripts
 - exact PCI IDs, BAR offsets, or device file paths
 
-Those belong in a board port. This repository owns the reusable structure.
+Those belong in a board port. The LiteFury target pack now carries the concrete
+adapter surface for its board tools, while the low-level SPI loader/protection
+binaries remain target install dependencies until they are packaged here with
+their licenses and provenance.
 
 ## Cleanroom Rewrite Policy
 

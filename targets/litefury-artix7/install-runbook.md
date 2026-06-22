@@ -1,9 +1,14 @@
 # LiteFury / Framework Install Runbook
 
-This runbook is the shape of the eventual turnkey install. Some commands are
-already present in this target pack; flash programming and the final Vivado
-top-level wrapper still need to be completed before this becomes one-command
-turnkey.
+This runbook is the target-specific install path for the LiteFury Artix-7 M.2
+FPGA in a Framework 13 appliance. The board-neutral GoldenGate contracts live
+at the repo root; this file is allowed to name LiteFury, XDMA, Framework Linux,
+S25FL flash protection, and the proven slot addresses directly.
+
+The pack is not yet a one-command installer for a fresh owner, but the flash
+program/protect adapters now exist. The remaining external dependency is the
+actual LiteFury SPI bridge binary and S25FL PPB protection helper on the
+Framework host.
 
 ## 0. Hardware Assumptions
 
@@ -38,6 +43,8 @@ Intended final layout:
 /opt/goldengate/bin/litefury-write32
 /opt/goldengate/bin/litefury-check-golden
 /opt/goldengate/bin/litefury-warmboot-slot
+/opt/goldengate/bin/spi-loader
+/opt/goldengate/bin/haptica-spi-protect
 ```
 
 Install dry-run:
@@ -90,13 +97,28 @@ Only set `verified=true` after app-slot flash readback matches the image hash.
 
 ## 5. Program And Verify An App Slot
 
-Bind the flash backend first. The backend is intentionally target-install
-specific; it may be a PCIe SPI bridge, vendor command, or lab wrapper.
+The target pack includes wrappers for the LiteFury SPI bridge. By default they
+look for `spi-loader` in `/opt/goldengate/bin`, `/opt/haptica/litefury/bin`, or
+`$PATH`. If your Framework install keeps it elsewhere, set:
 
 ```bash
-export LITEFURY_FLASH_PROGRAM_CMD=/opt/goldengate/bin/litefury-spi-program
-export LITEFURY_FLASH_READ_CMD=/opt/goldengate/bin/litefury-spi-read
+export LITEFURY_SPI_LOADER=/absolute/path/to/spi-loader
 ```
+
+The adapter uses the proven live shape:
+
+```text
+device   /dev/xdma0_user
+SPI base 0x10000
+target   0
+program  spi-loader -d DEVICE -r SPI_BASE -a ADDRESS -t TARGET -f IMAGE -l SIZE -v
+verify   spi-loader -d DEVICE -r SPI_BASE -a ADDRESS -t TARGET -f IMAGE -l SIZE -c -v
+```
+
+Those defaults can be changed with `LITEFURY_SPI_DEVICE`,
+`LITEFURY_SPI_BASE`, `LITEFURY_SPI_TARGET`, `LITEFURY_SPI_LOCK`,
+`LITEFURY_SPI_LOCK_WAIT_SECONDS`, `LITEFURY_SPI_TIMEOUT_SECONDS`, and
+`LITEFURY_SPI_USE_SUDO`.
 
 Dry-run slot A:
 
@@ -151,14 +173,18 @@ GOLDENGATE_APP_CYCLE_CONFIRM=RUN_APP_CYCLE \
 During active development, protect without the volatile/global PPB lock. Save
 locking for the final shipping posture.
 
-Protection backend contract:
+The target pack includes S25FL PPB protection adapters. By default they look
+for `haptica-spi-protect` in `/opt/goldengate/bin`,
+`/opt/haptica/litefury/bin`, or `$PATH`. If your Framework install keeps it
+elsewhere, set:
 
 ```bash
-export LITEFURY_FLASH_PROTECT_STATUS_CMD=/opt/goldengate/bin/litefury-spi-protect-status
-export LITEFURY_FLASH_PROTECT_CMD=/opt/goldengate/bin/litefury-spi-protect
-export LITEFURY_FLASH_UNPROTECT_CMD=/opt/goldengate/bin/litefury-spi-unprotect
-export LITEFURY_FLASH_VERIFY_PROTECT_CMD=/opt/goldengate/bin/litefury-spi-verify-protect
+export LITEFURY_SPI_PROTECT_TOOL=/absolute/path/to/haptica-spi-protect
 ```
+
+The PPB protection helper is target-specific to the LiteFury SPI flash. The
+important policy is portable: protect golden during iteration without the
+volatile PPB lock, and use `--lock-ppb` only for a final shipping freeze.
 
 Protection status:
 
@@ -185,6 +211,6 @@ GOLDENGATE_REFRESH_CONFIRM=REFRESH_PERMANENT_GOLDEN \
 ## Remaining Turnkey Work
 
 - finish the LiteFury Vivado top-level
-- bind flash erase/program/readback wrappers to the actual SPI flash tool
-- bind protected golden refresh to the actual SPI flash tool
+- package or document installation of `spi-loader`
+- package or document installation of `haptica-spi-protect`
 - add a live evidence bundle command

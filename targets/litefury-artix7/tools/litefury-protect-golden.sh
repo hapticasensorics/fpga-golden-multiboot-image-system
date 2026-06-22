@@ -65,6 +65,11 @@ require_confirm_for_mutation() {
     lf_die "real protection mutation requires GOLDENGATE_LITEFURY_PROTECT_CONFIRM=CHANGE_GOLDEN_FLASH_PROTECTION"
 }
 
+LITEFURY_FLASH_PROTECT_STATUS_CMD="${LITEFURY_FLASH_PROTECT_STATUS_CMD:-${script_dir}/litefury-spi-protect-status.sh}"
+LITEFURY_FLASH_PROTECT_CMD="${LITEFURY_FLASH_PROTECT_CMD:-${script_dir}/litefury-spi-protect.sh}"
+LITEFURY_FLASH_UNPROTECT_CMD="${LITEFURY_FLASH_UNPROTECT_CMD:-${script_dir}/litefury-spi-unprotect.sh}"
+LITEFURY_FLASH_VERIFY_PROTECT_CMD="${LITEFURY_FLASH_VERIFY_PROTECT_CMD:-${script_dir}/litefury-spi-verify-protect.sh}"
+
 run_backend() {
   local label="$1"
   local var_name="$2"

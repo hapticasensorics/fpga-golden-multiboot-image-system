@@ -15,6 +15,13 @@ implementation layer: Framework-side BAR tools, warmboot/return/rescan helpers,
 manifest generation, systemd examples, an AXI-Lite GoldenGate wrapper, an
 ICAPE2 warmboot sequencer, and a Vivado scaffold.
 
+Cleanroom does **not** mean target-agnostic. For this repository it means the
+LiteFury target pack is expressed from first principles with explicit contracts,
+proven addresses, named dependencies, and reproducible gates instead of being a
+private pile of lab scripts. A second owner with the same LiteFury/Framework
+hardware should be able to follow this pack and know exactly which remaining
+pieces are dependencies, gaps, or board-specific choices.
+
 ## Hardware Shape
 
 Observed target:

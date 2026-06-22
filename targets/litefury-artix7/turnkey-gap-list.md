@@ -31,9 +31,11 @@ XDMA, SPI-flash, thermal, and mechanical details needed by a real owner.
    - SHA-256 verification
    - protected-region refusal
    - golden refresh ceremony
-   - current status: manifest generation plus dry-run-safe flash/protect
-     ceremony wrappers exist; binding to the real LiteFury SPI bridge backend
-     is still missing
+   - current status: manifest generation, dry-run-safe flash/protect ceremony
+     wrappers, LiteFury `spi-loader` program/verify adapters, and S25FL PPB
+     protect/unprotect/verify adapters exist; packaging or documenting the
+     installation of the underlying `spi-loader` and `haptica-spi-protect`
+     binaries for a fresh Framework host is still missing
 
 4. PCIe/XDMA host tooling
    - BAR read/write helpers
@@ -78,9 +80,11 @@ XDMA, SPI-flash, thermal, and mechanical details needed by a real owner.
 ## Honest Status
 
 The current repository is enough to guide an implementation and avoid repeating
-the architecture mistakes. It is not yet a one-command LiteFury installer, but
-the correct direction is to fill this target pack in, not to keep the real
-LiteFury details out for the sake of false generality.
+the architecture mistakes. It is also now specific enough to be recognizable as
+a LiteFury Artix-7 / Framework target pack rather than a generic whitepaper.
+It is not yet a one-command LiteFury installer, but the correct direction is to
+fill this target pack in, not to keep the real LiteFury details out for the
+sake of false generality.
 
 That is a good next target: promote this profile from documentation into a real
 `targets/litefury-artix7/` implementation package.

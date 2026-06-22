@@ -23,7 +23,12 @@ image hashing, backend invocation, and optional readback verification.
 
 Backend command contract:
   LITEFURY_FLASH_PROGRAM_CMD IMAGE_PATH ADDRESS_HEX SIZE_BYTES
+  LITEFURY_FLASH_VERIFY_CMD  IMAGE_PATH ADDRESS_HEX SIZE_BYTES
   LITEFURY_FLASH_READ_CMD    ADDRESS_HEX SIZE_BYTES OUTPUT_PATH
+
+If `LITEFURY_FLASH_VERIFY_CMD` is present, verify-only mode uses it directly.
+Otherwise the script falls back to `LITEFURY_FLASH_READ_CMD` and compares the
+readback SHA-256 locally.
 
 Real execution requires:
   GOLDENGATE_LITEFURY_FLASH_CONFIRM=PROGRAM_LITEFURY_FLASH
@@ -71,6 +76,7 @@ address_hex="$(printf '0x%06x' "${address_dec}")"
 protected_limit_dec="$(lf_parse_num "${LITEFURY_PROTECTED_GOLDEN_LIMIT:-0x400000}")"
 image_size="$(wc -c < "${IMAGE}" | tr -d ' ')"
 image_sha="$(lf_sha256_file "${IMAGE}")"
+LITEFURY_FLASH_PROGRAM_CMD="${LITEFURY_FLASH_PROGRAM_CMD:-${script_dir}/litefury-spi-program.sh}"
 
 printf 'litefury_flash_image_start_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 printf 'image=%s\n' "${IMAGE}"
@@ -92,31 +98,37 @@ fi
 if [[ "${VERIFY_ONLY}" != "1" && "${DRY_RUN}" != "1" ]]; then
   [[ "${GOLDENGATE_LITEFURY_FLASH_CONFIRM:-}" == "PROGRAM_LITEFURY_FLASH" ]] ||
     lf_die "real flash requires GOLDENGATE_LITEFURY_FLASH_CONFIRM=PROGRAM_LITEFURY_FLASH"
-  [[ -n "${LITEFURY_FLASH_PROGRAM_CMD:-}" ]] ||
-    lf_die "missing LITEFURY_FLASH_PROGRAM_CMD"
 fi
 
 if [[ "${VERIFY_ONLY}" != "1" ]]; then
-  printf '+ %s %q %s %s\n' "${LITEFURY_FLASH_PROGRAM_CMD:-<flash-program-backend>}" "${IMAGE}" "${address_hex}" "${image_size}"
+  printf '+ %s %q %s %s\n' "${LITEFURY_FLASH_PROGRAM_CMD}" "${IMAGE}" "${address_hex}" "${image_size}"
   if [[ "${DRY_RUN}" != "1" ]]; then
     "${LITEFURY_FLASH_PROGRAM_CMD}" "${IMAGE}" "${address_hex}" "${image_size}"
   fi
 fi
 
 if [[ "${VERIFY}" == "1" ]]; then
-  if [[ "${DRY_RUN}" != "1" ]]; then
-    [[ -n "${LITEFURY_FLASH_READ_CMD:-}" ]] ||
-      lf_die "missing LITEFURY_FLASH_READ_CMD for verification"
-  fi
-  readback="$(mktemp)"
-  trap 'rm -f "${readback}"' EXIT
-  printf '+ %s %s %s %q\n' "${LITEFURY_FLASH_READ_CMD:-<flash-read-backend>}" "${address_hex}" "${image_size}" "${readback}"
-  if [[ "${DRY_RUN}" != "1" ]]; then
-    "${LITEFURY_FLASH_READ_CMD}" "${address_hex}" "${image_size}" "${readback}"
-    readback_sha="$(lf_sha256_file "${readback}")"
-    printf 'readback_sha256=%s\n' "${readback_sha}"
-    [[ "${readback_sha}" == "${image_sha}" ]] ||
-      lf_die "flash readback SHA mismatch"
+  LITEFURY_FLASH_VERIFY_CMD="${LITEFURY_FLASH_VERIFY_CMD:-${script_dir}/litefury-spi-verify.sh}"
+  if [[ -n "${LITEFURY_FLASH_VERIFY_CMD:-}" ]]; then
+    printf '+ %s %q %s %s\n' "${LITEFURY_FLASH_VERIFY_CMD}" "${IMAGE}" "${address_hex}" "${image_size}"
+    if [[ "${DRY_RUN}" != "1" ]]; then
+      "${LITEFURY_FLASH_VERIFY_CMD}" "${IMAGE}" "${address_hex}" "${image_size}"
+    fi
+  else
+    if [[ "${DRY_RUN}" != "1" ]]; then
+      [[ -n "${LITEFURY_FLASH_READ_CMD:-}" ]] ||
+        lf_die "missing LITEFURY_FLASH_VERIFY_CMD or LITEFURY_FLASH_READ_CMD for verification"
+    fi
+    readback="$(mktemp)"
+    trap 'rm -f "${readback}"' EXIT
+    printf '+ %s %s %s %q\n' "${LITEFURY_FLASH_READ_CMD:-<flash-read-backend>}" "${address_hex}" "${image_size}" "${readback}"
+    if [[ "${DRY_RUN}" != "1" ]]; then
+      "${LITEFURY_FLASH_READ_CMD}" "${address_hex}" "${image_size}" "${readback}"
+      readback_sha="$(lf_sha256_file "${readback}")"
+      printf 'readback_sha256=%s\n' "${readback_sha}"
+      [[ "${readback_sha}" == "${image_sha}" ]] ||
+        lf_die "flash readback SHA mismatch"
+    fi
   fi
 fi
 

@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-target_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+  source_path="${BASH_SOURCE[0]}"
+elif [[ -n "${ZSH_VERSION:-}" ]]; then
+  source_path="${(%):-%x}"
+else
+  source_path="$0"
+fi
+
+target_dir="$(cd "$(dirname "${source_path}")/.." && pwd)"
 repo_root="$(cd "${target_dir}/../.." && pwd)"
 tools_dir="${target_dir}/tools"
 
