@@ -20,6 +20,9 @@ but keep the BAR reads/writes local to the Framework whenever possible.
 | `litefury-pcie-rescan.sh` | Controlled PCIe remove/rescan and XDMA reload |
 | `litefury-cycle-slot.sh` | Warmboot a slot, prove app, return to golden, prove golden |
 | `litefury-watchdog.sh` | Arm or pet the app watchdog |
+| `litefury-health.sh` | Read `GHLT`/legacy health telemetry and print `temperature_c` |
+| `litefury-flash-image.sh` | Program or verify an image through a target SPI backend |
+| `litefury-protect-golden.sh` | Status/protect/unprotect/verify the golden flash region |
 | `litefury-gate-env.sh` | Exports callback commands for root GoldenGate gate templates |
 | `litefury-install-framework-host.sh` | Stages target tools onto Framework Linux |
 
@@ -55,9 +58,33 @@ Install dry-run:
 targets/litefury-artix7/tools/litefury-install-framework-host.sh --dry-run
 ```
 
+Flash backend dry-run:
+
+```bash
+targets/litefury-artix7/tools/litefury-flash-image.sh \
+  --slot A --image app-slot-a.bin --dry-run
+```
+
+Live flash programming requires target backend commands:
+
+```text
+LITEFURY_FLASH_PROGRAM_CMD IMAGE_PATH ADDRESS_HEX SIZE_BYTES
+LITEFURY_FLASH_READ_CMD    ADDRESS_HEX SIZE_BYTES OUTPUT_PATH
+```
+
+Golden protection similarly delegates to backend commands:
+
+```text
+LITEFURY_FLASH_PROTECT_STATUS_CMD BASE_HEX LIMIT_HEX
+LITEFURY_FLASH_PROTECT_CMD        BASE_HEX LIMIT_HEX LOCK_PPB_0_OR_1
+LITEFURY_FLASH_UNPROTECT_CMD      BASE_HEX LIMIT_HEX
+LITEFURY_FLASH_VERIFY_PROTECT_CMD BASE_HEX LIMIT_HEX
+```
+
+This split is deliberate. The target pack owns the safe ceremony and evidence;
+the board installation binds those commands to the actual LiteFury SPI bridge.
+
 ## Safety
 
-`litefury-warmboot-slot.sh`, `litefury-return-golden.sh`, and
-`litefury-pcie-rescan.sh` all require explicit confirmation environment
-variables for live execution. Dry-run modes can be used without touching
-hardware.
+Mutating commands require explicit confirmation environment variables for live
+execution. Dry-run modes can be used without touching hardware.

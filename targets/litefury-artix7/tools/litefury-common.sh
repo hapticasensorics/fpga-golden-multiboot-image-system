@@ -47,10 +47,25 @@ lf_word_is_one_of() {
   local word="$1"
   shift
   local candidate
+  local word_lc
+  local candidate_lc
+  word_lc="$(printf '%s' "${word}" | tr '[:upper:]' '[:lower:]')"
   for candidate in "$@"; do
-    [[ "${word,,}" == "${candidate,,}" ]] && return 0
+    candidate_lc="$(printf '%s' "${candidate}" | tr '[:upper:]' '[:lower:]')"
+    [[ "${word_lc}" == "${candidate_lc}" ]] && return 0
   done
   return 1
+}
+
+lf_sha256_file() {
+  local path="$1"
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "${path}" | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "${path}" | awk '{print $1}'
+  else
+    lf_die "sha256sum or shasum is required"
+  fi
 }
 
 lf_default_device="${LITEFURY_USER_DEVICE:-/dev/xdma0_user}"
@@ -59,4 +74,3 @@ lf_app_base="${LITEFURY_APP_BASE:-0x6000}"
 lf_slot_a_payload="${LITEFURY_SLOT_A_PAYLOAD:-0x680100}"
 lf_slot_b_payload="${LITEFURY_SLOT_B_PAYLOAD:-0xa80100}"
 lf_warmboot_flags="${LITEFURY_WARMBOOT_FLAGS:-0x3}"
-

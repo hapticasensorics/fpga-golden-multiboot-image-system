@@ -70,9 +70,30 @@ gg_temp_le() {
   awk -v t="${temp}" -v m="${max}" 'BEGIN { exit !(t <= m) }'
 }
 
+gg_health_preflight() {
+  local dry_run="$1"
+  local max_temp_c="$2"
+  local health_text
+  local temperature_c
+
+  if [[ "${dry_run}" == "1" && "${GOLDENGATE_DRY_RUN_EXECUTE_HEALTH:-0}" != "1" ]]; then
+    temperature_c="${GOLDENGATE_DRY_RUN_TEMPERATURE_C:-42}"
+    printf 'health_dry_run_synthetic=1\n'
+    printf 'temperature_c=%s\n' "${temperature_c}"
+  else
+    gg_require_command_env GOLDENGATE_HEALTH_CMD
+    health_text="$(bash -lc "${GOLDENGATE_HEALTH_CMD}")"
+    temperature_c="$(gg_extract_temperature_c "${health_text}")" ||
+      gg_die "health command did not print temperature_c"
+    printf 'temperature_c=%s\n' "${temperature_c}"
+  fi
+
+  gg_temp_le "${temperature_c}" "${max_temp_c}" ||
+    gg_die "temperature ${temperature_c} C exceeds limit ${max_temp_c} C"
+}
+
 gg_header() {
   local schema="$1"
   printf '%s_start_utc=%s\n' "${schema}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   printf 'schema=%s\n' "${schema}"
 }
-

@@ -73,6 +73,12 @@ Or through the generic gate:
 tools/gate-coldboot.sh --skip-thermal
 ```
 
+Read live health/temperature:
+
+```bash
+targets/litefury-artix7/tools/litefury-health.sh
+```
+
 ## 4. Prepare An App Manifest
 
 ```bash
@@ -82,7 +88,32 @@ targets/litefury-artix7/tools/litefury-create-app-manifest.sh app.bit A \
 
 Only set `verified=true` after app-slot flash readback matches the image hash.
 
-## 5. Warmboot Slot A
+## 5. Program And Verify An App Slot
+
+Bind the flash backend first. The backend is intentionally target-install
+specific; it may be a PCIe SPI bridge, vendor command, or lab wrapper.
+
+```bash
+export LITEFURY_FLASH_PROGRAM_CMD=/opt/goldengate/bin/litefury-spi-program
+export LITEFURY_FLASH_READ_CMD=/opt/goldengate/bin/litefury-spi-read
+```
+
+Dry-run slot A:
+
+```bash
+targets/litefury-artix7/tools/litefury-flash-image.sh \
+  --slot A --image app-slot-a.bin --dry-run
+```
+
+Program slot A:
+
+```bash
+GOLDENGATE_LITEFURY_FLASH_CONFIRM=PROGRAM_LITEFURY_FLASH \
+  targets/litefury-artix7/tools/litefury-flash-image.sh \
+    --slot A --image app-slot-a.bin --execute
+```
+
+## 6. Warmboot Slot A
 
 ```bash
 GOLDENGATE_LITEFURY_WARMBOOT_CONFIRM=JUMP_TO_VERIFIED_SLOT \
@@ -94,7 +125,7 @@ GOLDENGATE_LITEFURY_RESCAN_CONFIRM=CONTROLLED_RESCAN \
 targets/litefury-artix7/tools/litefury-check-app.sh
 ```
 
-## 6. Return To Golden
+## 7. Return To Golden
 
 ```bash
 GOLDENGATE_LITEFURY_RETURN_CONFIRM=RETURN_TO_GOLDEN \
@@ -106,7 +137,7 @@ GOLDENGATE_LITEFURY_RESCAN_CONFIRM=CONTROLLED_RESCAN \
 targets/litefury-artix7/tools/litefury-check-golden.sh
 ```
 
-## 7. Run The Full Cycle Gate
+## 8. Run The Full Cycle Gate
 
 ```bash
 . targets/litefury-artix7/tools/litefury-gate-env.sh
@@ -115,10 +146,45 @@ GOLDENGATE_APP_CYCLE_CONFIRM=RUN_APP_CYCLE \
   tools/gate-app-cycle.sh --execute --max-temp-c 85
 ```
 
+## 9. Protect Or Refresh Golden
+
+During active development, protect without the volatile/global PPB lock. Save
+locking for the final shipping posture.
+
+Protection backend contract:
+
+```bash
+export LITEFURY_FLASH_PROTECT_STATUS_CMD=/opt/goldengate/bin/litefury-spi-protect-status
+export LITEFURY_FLASH_PROTECT_CMD=/opt/goldengate/bin/litefury-spi-protect
+export LITEFURY_FLASH_UNPROTECT_CMD=/opt/goldengate/bin/litefury-spi-unprotect
+export LITEFURY_FLASH_VERIFY_PROTECT_CMD=/opt/goldengate/bin/litefury-spi-verify-protect
+```
+
+Protection status:
+
+```bash
+targets/litefury-artix7/tools/litefury-protect-golden.sh --status --dry-run
+```
+
+Generic gate binding:
+
+```bash
+. targets/litefury-artix7/tools/litefury-gate-env.sh
+tools/gate-golden-protect.sh --status --dry-run
+```
+
+Permanent golden refresh uses the same backend plus `LITEFURY_GOLDEN_IMAGE`:
+
+```bash
+export LITEFURY_GOLDEN_IMAGE=golden.bin
+
+GOLDENGATE_REFRESH_CONFIRM=REFRESH_PERMANENT_GOLDEN \
+  tools/gate-protected-golden-refresh.sh --execute --max-temp-c 85
+```
+
 ## Remaining Turnkey Work
 
 - finish the LiteFury Vivado top-level
-- add flash erase/program/readback wrappers
-- add protected golden refresh wrapper bound to the actual SPI flash tool
-- add installer that places scripts and systemd units under `/opt/goldengate`
+- bind flash erase/program/readback wrappers to the actual SPI flash tool
+- bind protected golden refresh to the actual SPI flash tool
 - add a live evidence bundle command

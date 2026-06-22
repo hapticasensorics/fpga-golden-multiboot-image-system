@@ -60,12 +60,7 @@ done
 gg_header "goldengate.gate_protected_golden_refresh.v1"
 printf 'dry_run=%s\n' "${DRY_RUN}"
 printf 'lock_after_refresh=%s\n' "${LOCK_AFTER_REFRESH}"
-health_text="$(bash -lc "${GOLDENGATE_HEALTH_CMD}")"
-temperature_c="$(gg_extract_temperature_c "${health_text}")" ||
-  gg_die "health command did not print temperature_c"
-printf 'temperature_c=%s\n' "${temperature_c}"
-gg_temp_le "${temperature_c}" "${MAX_TEMP_C}" ||
-  gg_die "temperature ${temperature_c} C exceeds limit ${MAX_TEMP_C} C"
+gg_health_preflight "${DRY_RUN}" "${MAX_TEMP_C}"
 
 gg_run_step "${DRY_RUN}" "unprotect-golden-for-refresh" "${GOLDENGATE_UNPROTECT_FOR_REFRESH_CMD}"
 gg_run_step "${DRY_RUN}" "program-candidate-golden" "${GOLDENGATE_PROGRAM_GOLDEN_CMD}"

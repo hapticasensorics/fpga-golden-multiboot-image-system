@@ -27,8 +27,9 @@ XDMA, SPI-flash, thermal, and mechanical details needed by a real owner.
    - SHA-256 verification
    - protected-region refusal
    - golden refresh ceremony
-   - current status: manifest generation exists, flash write/readback wrappers
-     are still missing
+   - current status: manifest generation plus dry-run-safe flash/protect
+     ceremony wrappers exist; binding to the real LiteFury SPI bridge backend
+     is still missing
 
 4. PCIe/XDMA host tooling
    - BAR read/write helpers
@@ -36,14 +37,15 @@ XDMA, SPI-flash, thermal, and mechanical details needed by a real owner.
    - driver reload and health checks
    - evidence capture
    - current status: BAR read/write, identity checks, warmboot, return, and
-     controlled rescan scripts exist
+     controlled rescan scripts exist; `litefury-health.sh` provides the first
+     target-bound health/temperature readout
 
 5. Framework 13 appliance integration
    - Linux package/install script
    - systemd services
    - display/audio/input services if used by an app
    - boot splash or console policy, if appliance-like UX matters
-   - current status: systemd examples exist, installer is still missing
+   - current status: systemd examples and a dry-run-safe installer exist
 
 6. Mechanical/thermal validation
    - open chassis baseline

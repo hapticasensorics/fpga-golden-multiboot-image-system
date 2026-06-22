@@ -46,12 +46,7 @@ done
 
 gg_header "goldengate.gate_app_cycle.v1"
 printf 'dry_run=%s\n' "${DRY_RUN}"
-health_text="$(bash -lc "${GOLDENGATE_HEALTH_CMD}")"
-temperature_c="$(gg_extract_temperature_c "${health_text}")" ||
-  gg_die "health command did not print temperature_c"
-printf 'temperature_c=%s\n' "${temperature_c}"
-gg_temp_le "${temperature_c}" "${MAX_TEMP_C}" ||
-  gg_die "temperature ${temperature_c} C exceeds limit ${MAX_TEMP_C} C"
+gg_health_preflight "${DRY_RUN}" "${MAX_TEMP_C}"
 
 gg_run_step "${DRY_RUN}" "check-golden-before-app" "${GOLDENGATE_CHECK_GOLDEN_CMD}"
 gg_run_step "${DRY_RUN}" "warmboot-app-slot" "${GOLDENGATE_WARMBOOT_APP_CMD}"
@@ -61,4 +56,3 @@ gg_run_step "${DRY_RUN}" "return-to-golden" "${GOLDENGATE_RETURN_GOLDEN_CMD}"
 gg_run_step "${DRY_RUN}" "transport-rescan-after-return" "${GOLDENGATE_RESCAN_CMD}"
 gg_run_step "${DRY_RUN}" "check-golden-after-return" "${GOLDENGATE_CHECK_GOLDEN_CMD}"
 printf 'goldengate_gate_app_cycle_pass=1\n'
-
