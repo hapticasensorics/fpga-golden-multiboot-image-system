@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hapticasensorics.github.io/fpga-golden-multiboot-image-system/specs/event-log.schema.json",
+  "title": "GoldenGate FPGA Event Log Entry",
+  "type": "object",
+  "required": [
+    "sequence",
+    "timestamp_source",
+    "event_code",
+    "boot_reason",
+    "slot",
+    "detail"
+  ],
+  "properties": {
+    "sequence": { "type": "integer", "minimum": 0 },
+    "timestamp_source": { "type": "string" },
+    "event_code": { "type": "integer", "minimum": 0 },
+    "boot_reason": { "type": "integer", "minimum": 0 },
+    "slot": { "type": "string", "enum": ["none", "A", "B"] },
+    "detail": { "type": "string" },
+    "temperature_c": { "type": "number" },
+    "build_id": { "type": "string" }
+  },
+  "additionalProperties": false
+}
+

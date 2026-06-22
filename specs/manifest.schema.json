@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hapticasensorics.github.io/fpga-golden-multiboot-image-system/specs/manifest.schema.json",
+  "title": "GoldenGate FPGA App Image Manifest",
+  "type": "object",
+  "required": [
+    "manifest_version",
+    "image_name",
+    "image_sha256",
+    "slot",
+    "slot_base",
+    "payload_offset",
+    "payload_address",
+    "image_size_bytes",
+    "verified"
+  ],
+  "properties": {
+    "manifest_version": { "type": "integer", "minimum": 1 },
+    "image_name": { "type": "string", "minLength": 1 },
+    "image_sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "slot": { "type": "string", "enum": ["A", "B"] },
+    "slot_base": { "type": "string", "pattern": "^0x[0-9a-fA-F]+$" },
+    "payload_offset": { "type": "string", "pattern": "^0x[0-9a-fA-F]+$" },
+    "payload_address": { "type": "string", "pattern": "^0x[0-9a-fA-F]+$" },
+    "image_size_bytes": { "type": "integer", "minimum": 1 },
+    "verified": { "type": "boolean" },
+    "source_commit": { "type": "string" },
+    "build_time_utc": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}
+

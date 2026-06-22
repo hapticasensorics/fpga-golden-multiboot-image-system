@@ -1,0 +1,13 @@
+build/
+artifacts/
+*.log
+*.jou
+*.rpt
+*.dcp
+*.bit
+*.bin
+*.mcs
+*.prm
+*.wdb
+.DS_Store
+

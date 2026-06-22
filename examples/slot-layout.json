@@ -1,0 +1,10 @@
+{
+  "golden_base": "0x00000000",
+  "golden_limit": "0x00400000",
+  "slot_a_base": "0x00680000",
+  "slot_b_base": "0x00a80000",
+  "slot_size": "0x00400000",
+  "payload_offset": "0x00000100",
+  "update_region_end": "0x01000000"
+}
+

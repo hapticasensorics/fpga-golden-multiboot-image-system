@@ -1,0 +1,15 @@
+{
+  "manifest_version": 1,
+  "image_name": "known-good-demo-app",
+  "image_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "slot": "A",
+  "slot_base": "0x00680000",
+  "payload_offset": "0x00000100",
+  "payload_address": "0x00680100",
+  "image_size_bytes": 2097152,
+  "verified": true,
+  "source_commit": "example",
+  "build_time_utc": "2026-01-01T00:00:00Z",
+  "notes": "Example only. Replace all hashes and addresses for a real board."
+}
+
