@@ -1,0 +1,14 @@
+[Unit]
+Description=GoldenGate LiteFury health poller
+After=goldengate-xdma-load.service
+Requires=goldengate-xdma-load.service
+
+[Service]
+Type=simple
+ExecStart=/opt/goldengate/bin/litefury-health-poller
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+

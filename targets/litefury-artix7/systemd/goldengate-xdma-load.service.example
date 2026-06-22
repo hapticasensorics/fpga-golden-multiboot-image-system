@@ -1,0 +1,13 @@
+[Unit]
+Description=GoldenGate LiteFury XDMA loader
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/goldengate/bin/litefury-load-xdma
+ExecStop=/sbin/modprobe -r xdma
+
+[Install]
+WantedBy=multi-user.target
+

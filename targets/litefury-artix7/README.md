@@ -1,14 +1,18 @@
 # LiteFury Artix-7 Target Profile
 
-This target profile describes the concrete hardware that motivated GoldenGate
-FPGA.
+This target pack describes the concrete hardware that motivated GoldenGate
+FPGA. It is the reference implementation target, not a generic placeholder.
 
 It is a **LiteFury M.2 FPGA board** using a Xilinx Artix-7 class device, used as
 an internal FPGA appliance in a Framework 13 laptop. The working appliance also
 uses Framework-hosted Linux, PCIe/XDMA control, SPI flash slots, and a separate
 internal storage arrangement.
 
-This directory is a target profile, not yet a complete turnkey board port.
+This directory is the cleanroom LiteFury/Framework implementation surface. It is
+not yet a complete one-command board port, but hardware-specific details belong
+here rather than being diluted into the generic root. It now includes the first
+implementation layer: Framework-side BAR tools, warmboot/return/rescan helpers,
+manifest generation, systemd examples, and a Vivado/RTL scaffold.
 
 ## Hardware Shape
 
@@ -70,7 +74,7 @@ The concrete appliance used these ideas:
 
 To make this target turnkey inside this repo, add:
 
-- Vivado project or Tcl flow for the LiteFury Artix-7 board
+- completed Vivado project or Tcl flow for the LiteFury Artix-7 board
 - Xilinx `ICAPE2` warmboot binding
 - SPI flash read/write/protect command engine
 - PCIe/XDMA BAR transport tools
@@ -80,6 +84,9 @@ To make this target turnkey inside this repo, add:
 - exact bitstream packaging flow for `slot_base + 0x100`
 - permanent golden flash refresh procedure
 - app-slot flash procedure
+
+Some of those pieces now exist as scaffolds under `tools/`, `rtl/`, `vivado/`,
+and `systemd/`; see [turnkey-gap-list.md](turnkey-gap-list.md) for what remains.
 
 ## Why This Is Not In The Generic Root
 
@@ -95,3 +102,6 @@ Most GoldenGate concepts are portable. These details are not:
 
 They belong in this target profile or a future target-specific package.
 
+That is the key boundary: generality lives in the GoldenGate contracts; turnkey
+use lives in a target pack. A second LiteFury/Framework owner should start here,
+not from the board-neutral examples.

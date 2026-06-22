@@ -7,12 +7,14 @@ It is for boards where a small trusted bitstream should always boot first,
 keep the device recoverable without JTAG, load application images from flash
 slots, observe app health, and return to golden automatically when an app fails.
 
-The architecture is portable, but real hardware is not abstract. The repository
-therefore has two layers:
+The architecture is portable, but real hardware is not abstract. A professional
+golden-image system is normally implemented per FPGA target because flash
+layouts, warmboot primitives, PCIe behavior, thermal policy, and host recovery
+are all board-specific. This repository therefore has two layers:
 
 - a board-neutral GoldenGate architecture
-- concrete hardware target profiles, starting with LiteFury Artix-7 in a
-  Framework 13 appliance
+- concrete hardware target implementation packs, starting with LiteFury Artix-7
+  in a Framework 13 appliance
 
 It documents the standard architecture and provides cleanroom examples for:
 
@@ -82,9 +84,10 @@ the board back to a known state.
 ## Status
 
 This repository is a portable specification and starter kit with a concrete
-LiteFury/Framework target profile. The RTL blocks are small reference
-implementations, not a drop-in replacement for a vendor's full configuration or
-flash controller.
+LiteFury/Framework target implementation pack. The generic root defines the
+contract. The LiteFury target is where the real board-specific system belongs.
+That target-specificity is intentional: it is how the clean architecture becomes
+turnkey hardware rather than an abstract diagram.
 
 If someone has the same LiteFury/Framework hardware, this repo now explains the
 target and the proven slot/warmboot shape, but it is **not yet a one-command
