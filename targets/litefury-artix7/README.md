@@ -3,23 +3,24 @@
 This target pack describes the concrete hardware that motivated GoldenGate
 FPGA. It is the reference implementation target, not a generic placeholder.
 
-It is a **LiteFury M.2 FPGA board** using a Xilinx Artix-7 class device, used as
-an internal FPGA appliance in a Framework 13 laptop. The working appliance also
-uses Framework-hosted Linux, PCIe/XDMA control, SPI flash slots, and a separate
-internal storage arrangement.
+It is a **LiteFury M.2 FPGA board** using a Xilinx Artix-7
+`XC7A100T-L2FGG484E` device, used as an internal FPGA appliance in a Framework
+13 laptop. The working appliance also uses Framework-hosted Linux, PCIe/XDMA
+control, SPI flash slots, and a separate internal storage arrangement.
 
 This directory is the cleanroom LiteFury/Framework implementation surface. It is
 not yet a complete one-command board port, but hardware-specific details belong
 here rather than being diluted into the generic root. It now includes the first
 implementation layer: Framework-side BAR tools, warmboot/return/rescan helpers,
-manifest generation, systemd examples, and a Vivado/RTL scaffold.
+manifest generation, systemd examples, an AXI-Lite GoldenGate wrapper, an
+ICAPE2 warmboot sequencer, and a Vivado scaffold.
 
 ## Hardware Shape
 
 Observed target:
 
 - LiteFury M.2 FPGA card
-- Xilinx Artix-7 family FPGA
+- Xilinx Artix-7 `XC7A100T-L2FGG484E` FPGA
 - SPI flash used for coldboot golden plus app slots
 - PCIe endpoint exposed to Framework Linux
 - XDMA-style host path for BAR/register access
@@ -74,7 +75,8 @@ The concrete appliance used these ideas:
 
 To make this target turnkey inside this repo, add:
 
-- completed Vivado project or Tcl flow for the LiteFury Artix-7 board
+- completed full-board Vivado project or Tcl flow for the LiteFury Artix-7
+  board
 - Xilinx `ICAPE2` warmboot binding
 - SPI flash read/write/protect command engine
 - PCIe/XDMA BAR transport tools
@@ -85,8 +87,9 @@ To make this target turnkey inside this repo, add:
 - permanent golden flash refresh procedure
 - app-slot flash procedure
 
-Some of those pieces now exist as scaffolds under `tools/`, `rtl/`, `vivado/`,
-and `systemd/`; see [turnkey-gap-list.md](turnkey-gap-list.md) for what remains.
+Some of those pieces now exist under `tools/`, `rtl/`, `vivado/`,
+`constraints/`, and `systemd/`; see [turnkey-gap-list.md](turnkey-gap-list.md)
+for what remains.
 
 ## Why This Is Not In The Generic Root
 

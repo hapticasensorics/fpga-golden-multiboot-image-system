@@ -3,17 +3,17 @@
 This directory contains LiteFury-specific RTL adapters that bind GoldenGate's
 generic contracts to Xilinx 7-series behavior.
 
-Current file:
+Current files:
 
 - `litefury_artix7_icap_multiboot.sv`: cleanroom ICAPE2 warmboot sequencer
   skeleton for `WBSTAR` + `IPROG`.
+- `litefury_artix7_goldengate_top.sv`: AXI-Lite wrapper that exposes the
+  GoldenGate golden page and health page to a LiteFury PCIe/XDMA shell.
 
-The next required file is a real `litefury_goldengate_top.sv` that connects:
+Still needed for a full board image:
 
-- PCIe/XDMA AXI-Lite control bus
-- `golden_multiboot_controller`
-- `health_telemetry_regs`
+- PCIe/XDMA physical shell and block design
+- LiteFury clock/reset and PCIe reset binding
 - SPI flash/protection status
-- ICAPE2 multiboot sequencer
+- XADC/SYSMON sampler feeding `health_telemetry_regs`
 - app-slot compatibility pages if needed
-

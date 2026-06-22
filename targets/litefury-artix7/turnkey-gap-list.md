@@ -13,14 +13,18 @@ XDMA, SPI-flash, thermal, and mechanical details needed by a real owner.
    - PCIe/XDMA shell
    - SPI flash pins and configuration mode
    - ICAPE2 warmboot wrapper
+   - current status: part number, AXI-Lite GoldenGate wrapper, ICAPE2
+     warmboot wrapper, and shell-level XDC template exist; full PCIe/XDMA/SPI
+     board shell is still missing
 
 2. Golden bitstream build flow
    - build script
    - timing gate
    - artifact naming
    - bitstream-to-flash-image conversion
-   - current status: Vivado scaffold exists, real top-level and constraints are
-     still missing
+   - current status: Vivado Tcl and shell wrapper can create the project and
+     optionally run synth/impl for `litefury_artix7_goldengate_top`; final
+     flash-image packaging and full-board timing gate are still missing
 
 3. Host flash tooling
    - SPI erase/program/readback
@@ -67,6 +71,7 @@ XDMA, SPI-flash, thermal, and mechanical details needed by a real owner.
 - cleanroom RTL starting point
 - gate sequence templates
 - LiteFury BAR/warmboot/rescan tool scaffolds
+- LiteFury AXI-Lite golden wrapper and Vivado build scaffold
 - safety model
 - evidence schema
 

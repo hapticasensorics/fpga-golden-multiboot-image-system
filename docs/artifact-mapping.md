@@ -15,6 +15,9 @@ For the first real hardware target, the board-specific facts now live under
 | Permanent golden identity and warmboot BAR | `rtl/golden_multiboot_controller.sv`, `docs/register-map.md` |
 | App heartbeat and return-to-golden page | `rtl/app_recovery_contract.sv`, `specs/app-contract.v1.md` |
 | FPGA health/XADC readback | `rtl/health_telemetry_regs.sv`, `tools/thermal-wait.sh` |
+| LiteFury AXI-Lite target wrapper | `targets/litefury-artix7/rtl/litefury_artix7_goldengate_top.sv` |
+| LiteFury ICAPE2 multiboot binding | `targets/litefury-artix7/rtl/litefury_artix7_icap_multiboot.sv` |
+| LiteFury Vivado build flow | `targets/litefury-artix7/vivado/build-golden.tcl`, `targets/litefury-artix7/vivado/build-golden.sh` |
 | Slot A/B flash planning | `tools/slot-plan.sh`, `docs/flash-layout.md` |
 | Manifest/readback discipline | `specs/manifest.schema.json`, `tools/manifest-check.sh` |
 | Golden coldboot proof gate | `tools/gate-coldboot.sh` |
