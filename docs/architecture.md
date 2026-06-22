@@ -1,6 +1,6 @@
 # Architecture
 
-GoldenGate FPGA is split into three planes:
+GoldenGate FPGA is split into three planes plus a target-binding layer:
 
 1. **Golden plane**
    - permanent bitstream at a protected flash address
@@ -23,6 +23,13 @@ GoldenGate FPGA is split into three planes:
    - re-enumerates the transport if warmboot resets the endpoint
    - reads health, boot reason, heartbeat, watchdog, and event logs
 
+4. **Target binding**
+   - connects the generic golden/app contracts to a real FPGA board
+   - binds warmboot to the vendor primitive
+   - binds flash read/write/protect to the board's flash path
+   - binds health telemetry to the board's sensors
+   - binds host transport re-entry to the board's driver and bus behavior
+
 ```mermaid
 flowchart LR
   Host["Host tools"] --> Golden["Permanent golden image"]
@@ -35,6 +42,8 @@ flowchart LR
   Return --> Golden
   Golden --> Health["Health and boot telemetry"]
   Health --> Host
+  Target["Target binding"] --> Golden
+  Target --> Host
 ```
 
 ## Cold Boot
@@ -71,6 +80,14 @@ Every app should expose a small standard page:
 The product can expose any additional interfaces it needs, but these standard
 signals keep infrastructure independent of the product.
 
+## Target Profiles
+
+The generic architecture is only useful when a target profile makes the hardware
+details explicit. The first profile is
+[LiteFury Artix-7](../targets/litefury-artix7/README.md), covering the M.2 FPGA
+inside a Framework 13 appliance, its SPI slot map, PCIe/XDMA-style transport,
+and remaining turnkey gaps.
+
 ## Recovery
 
 The system should support at least three recovery paths:
@@ -81,4 +98,3 @@ The system should support at least three recovery paths:
 
 Failure-path proof requires a deliberately bad or wedging fixture. A working app
 proves the happy path, not fallback.
-

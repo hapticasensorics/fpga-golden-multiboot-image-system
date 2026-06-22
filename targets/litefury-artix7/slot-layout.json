@@ -1,0 +1,28 @@
+{
+  "target": "litefury-artix7-framework13",
+  "flash_size": "0x01000000",
+  "protected_golden": {
+    "base": "0x00000000",
+    "limit_exclusive": "0x00400000"
+  },
+  "update_region": {
+    "base": "0x00400000",
+    "limit_exclusive": "0x01000000"
+  },
+  "payload_offset": "0x00000100",
+  "slots": [
+    {
+      "name": "A",
+      "base": "0x00680000",
+      "size": "0x00400000",
+      "payload_address": "0x00680100"
+    },
+    {
+      "name": "B",
+      "base": "0x00a80000",
+      "size": "0x00400000",
+      "payload_address": "0x00a80100"
+    }
+  ]
+}
+

@@ -7,9 +7,14 @@ It is for boards where a small trusted bitstream should always boot first,
 keep the device recoverable without JTAG, load application images from flash
 slots, observe app health, and return to golden automatically when an app fails.
 
-The repository is intentionally not tied to one board, one PCIe core, or one
-application. It documents the standard architecture and provides small
-cleanroom examples for:
+The architecture is portable, but real hardware is not abstract. The repository
+therefore has two layers:
+
+- a board-neutral GoldenGate architecture
+- concrete hardware target profiles, starting with LiteFury Artix-7 in a
+  Framework 13 appliance
+
+It documents the standard architecture and provides cleanroom examples for:
 
 - a permanent golden image at flash address `0x0`
 - one or more application slots elsewhere in flash
@@ -48,6 +53,7 @@ specs/      Stable interfaces, schemas, and register contracts
 rtl/        Small cleanroom RTL reference blocks
 tools/      Portable host-side planning and warmboot examples
 examples/   Example slot layout and image manifest files
+targets/    Concrete hardware target profiles and future board ports
 ```
 
 ## Start Here
@@ -62,6 +68,8 @@ Read these in order:
 6. [Verification Gates](docs/verification-gates.md)
 7. [Operations Runbook](docs/operations-runbook.md)
 8. [Artifact Mapping](docs/artifact-mapping.md)
+9. [Implementation Completeness](docs/implementation-completeness.md)
+10. [LiteFury Artix-7 Target](targets/litefury-artix7/README.md)
 
 ## Core Rule
 
@@ -73,9 +81,16 @@ the board back to a known state.
 
 ## Status
 
-This repository is a portable specification and starter kit. The RTL blocks are
-small reference implementations, not a drop-in replacement for a vendor's full
-configuration or flash controller.
+This repository is a portable specification and starter kit with a concrete
+LiteFury/Framework target profile. The RTL blocks are small reference
+implementations, not a drop-in replacement for a vendor's full configuration or
+flash controller.
+
+If someone has the same LiteFury/Framework hardware, this repo now explains the
+target and the proven slot/warmboot shape, but it is **not yet a one-command
+installer**. A turnkey LiteFury port still needs the board-specific Vivado flow,
+XDMA/BAR tools, SPI flash programmer, Framework Linux services, and exact app
+wrappers gathered under `targets/litefury-artix7/`.
 
 When porting to a real board, bind these concepts to the vendor primitives and
 host transport you actually use:

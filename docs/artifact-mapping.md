@@ -5,6 +5,9 @@ The source project had concrete board scripts, addresses, service names, and
 application identities. GoldenGate FPGA keeps the architecture and replaces
 those details with portable contracts.
 
+For the first real hardware target, the board-specific facts now live under
+`targets/litefury-artix7/`.
+
 ## Source Category to GoldenGate Artifact
 
 | Source-system category | GoldenGate cleanroom equivalent |
