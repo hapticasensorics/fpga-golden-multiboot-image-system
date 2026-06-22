@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hapticasensorics.github.io/fpga-golden-multiboot-image-system/specs/gate-evidence.schema.json",
+  "title": "GoldenGate FPGA Gate Evidence",
+  "type": "object",
+  "required": [
+    "schema",
+    "gate_name",
+    "started_utc",
+    "finished_utc",
+    "pass",
+    "fail_stage",
+    "identity_before",
+    "identity_after"
+  ],
+  "properties": {
+    "schema": { "type": "string" },
+    "gate_name": { "type": "string" },
+    "started_utc": { "type": "string" },
+    "finished_utc": { "type": "string" },
+    "pass": { "type": "boolean" },
+    "fail_stage": { "type": ["string", "null"] },
+    "source_commit": { "type": "string" },
+    "bitstream_sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "slot": { "type": "string" },
+    "payload_address": { "type": "string", "pattern": "^0x[0-9a-fA-F]+$" },
+    "temperature_c": { "type": "number" },
+    "max_temp_c": { "type": "number" },
+    "boot_reason": { "type": "string" },
+    "identity_before": { "type": "string" },
+    "identity_after": { "type": "string" },
+    "heartbeat_before": { "type": "integer" },
+    "heartbeat_after": { "type": "integer" },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "event-log.schema.json" }
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}

@@ -60,6 +60,8 @@ Read these in order:
 4. [Register Map](docs/register-map.md)
 5. [Host Workflows](docs/host-workflows.md)
 6. [Verification Gates](docs/verification-gates.md)
+7. [Operations Runbook](docs/operations-runbook.md)
+8. [Artifact Mapping](docs/artifact-mapping.md)
 
 ## Core Rule
 
@@ -84,3 +86,19 @@ host transport you actually use:
 - XADC/SYSMON or board thermal monitor
 - host driver reload or PCIe remove/rescan sequence
 
+## Gate Templates
+
+The `tools/` directory includes generic gate templates for the standard
+recovery lifecycle:
+
+- coldboot golden proof
+- golden-to-app-to-golden cycle
+- A/B known-good slot proof
+- deliberately bad-slot fallback proof
+- app watchdog recovery proof
+- golden flash-protection policy
+- thermal wait and transport re-entry helpers
+
+They are deliberately command-callback based. Users wire them to their own board
+tools through environment variables instead of editing board assumptions into
+the generic scripts.
